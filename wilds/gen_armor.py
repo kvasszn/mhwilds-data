@@ -18,10 +18,10 @@ MSG_FILES = [
 ]
 
 def parse_armor(self):
-    f = open(os.path.join(base, "natives/stm/gamedesign/common/equip/armorseriesdata.user.3.json"))
-    seriesdata = next(iter(json.load(f).values()))["_Values"]
-    f = open(os.path.join(base, "natives/stm/gamedesign/common/equip/armordata.user.3.json"))
-    piecesdata = next(iter(json.load(f).values()))["_Values"]
+    f = open(os.path.join(base, "natives/STM/GameDesign/Common/Equip/ArmorSeriesData.user.3.json"))
+    seriesdata = json.load(f)[0]["rsz"]["_Values"]
+    f = open(os.path.join(base, "natives/STM/GameDesign/Common/Equip/ArmorData.user.3.json"))
+    piecesdata = json.load(f)[0]["rsz"]["_Values"]
     
     armor_series = {}
     for series in seriesdata:

@@ -14,7 +14,7 @@ import json
 base = os.environ["BASE"]
 
 MSG_FILES = [
-        "wilds/combined_msgs.json"
+        "combined_msgs.json"
 ]
 
 """
@@ -38,10 +38,10 @@ RATION_TYPE_MAP = {
 }
 
 def parse_meals(self):
-    f = open(os.path.join(base, "natives/stm/gamedesign/facility/mealdata.user.3.json"))
-    mealdata = next(iter(json.load(f).values()))["_Values"]
-    f = open(os.path.join(base, "natives/stm/gamedesign/facility/fooddata.user.3.json"))
-    fooddata = next(iter(json.load(f).values()))["_Values"]
+    f = open(os.path.join(base, "natives/STM/GameDesign/Facility/MealData.user.3.json"))
+    mealdata = json.load(f)[0]["rsz"]["_Values"]
+    f = open(os.path.join(base, "natives/STM/GameDesign/Facility/FoodData.user.3.json"))
+    fooddata = json.load(f)[0]["rsz"]["_Values"]
     meals = {
         "rations": [],
         "additional": {},

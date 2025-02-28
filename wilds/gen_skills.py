@@ -13,15 +13,14 @@ base = os.environ["BASE"]
 
 
 MSG_FILES = [
-        #"combined_msgs.json",
-        "../../../mhwstuff/outputs/wilds/combined_msgs.json"
+        "combined_msgs.json"
 ]
 
 def parse_skills(self):
-    f = open(os.path.join(base, "natives/stm/gamedesign/common/equip/skilldata.user.3.json"))
-    skilldata = next(iter(json.load(f).values()))["_Values"]
-    f = open(os.path.join(base, "natives/stm/gamedesign/common/equip/skillcommondata.user.3.json"))
-    skillcommondata = next(iter(json.load(f).values()))["_Values"]
+    f = open(os.path.join(base, "natives/STM/GameDesign/Common/Equip/SkillData.user.3.json"))
+    skilldata = json.load(f)[0]["rsz"]["_Values"]
+    f = open(os.path.join(base, "natives/STM/GameDesign/Common/Equip/SkillCommonData.user.3.json"))
+    skillcommondata = json.load(f)[0]["rsz"]["_Values"]
     common = {}
     for skill in skillcommondata:
         id = skill["_skillId"]
@@ -83,8 +82,8 @@ def parse_skills(self):
     return results, common
 
 def parse_mealskills(self):
-    f = open(os.path.join(base, "natives/stm/gamedesign/common/facility/mealskilldata.user.3.json"))
-    skilldata = next(iter(json.load(f).values()))["_Values"]
+    f = open(os.path.join(base, "natives/STM/GameDesign/Common/Facility/MealSkillData.user.3.json"))
+    skilldata = json.load(f)[0]["rsz"]["_Values"]
     results = {}
     out_dir = "wilds/data/skill_icons"
     for skill in skilldata:

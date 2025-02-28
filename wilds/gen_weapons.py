@@ -51,11 +51,29 @@ WEAPON_DATA = [
     "LIGHTBOWGUN",
 ]
 
+
+WEAPON_DATA = [
+    "LongSword",
+    "ShortSword",
+    "TwinSword",
+    "Tachi",
+    "Hammer",
+    "Whistle",
+    "Lance",
+    "GunLance",
+    "SlashAxe",
+    "ChargeAxe",
+    "Rod",
+    "Bow",
+    "HeavyBowgun",
+    "LightBowgun",
+]
+
 def parse_weapons(self):
     weapondata = []
     for key in WEAPON_DATA:
-        f = open(os.path.join(base, f"natives/stm/gamedesign/common/weapon/{key.lower()}.user.3.json"))
-        weapondata += next(iter(json.load(f).values()))["_Values"]
+        f = open(os.path.join(base, f"natives/STM/GameDesign/Common/Weapon/{key}.user.3.json"))
+        weapondata += json.load(f)[0]["rsz"]["_Values"]
     weapons = {
         "LONG_SWORD": {},
         "SHORT_SWORD": {},
