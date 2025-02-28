@@ -120,15 +120,13 @@ WILDS_COLOR_IDX_MAP = {
 }
 
 def read_colors(base):
-    path = "natives/stm/gui/colorpreset.gcp.2"
+    path = "natives/STM/GUI/colorPreset.gcp.2"
     f = open(os.path.join(base, path), 'rb')
     colors = []
     data = io.BytesIO(f.read())
     ver = data.read(4)
     magic = data.read(4)
-    #print("colors:", ver, magic)
     n = int.from_bytes(data.read(8)[::-1])
-    #print(n)
 
     for _ in range(1, n):
         sub_colors = [
@@ -141,9 +139,7 @@ def read_colors(base):
                 for _ in range(4)]
         unk = data.read(4)
         null = data.read(4)
-        #print(unk)
-        #print(int.from_bytes(unk[::-1]))
-        #print(int.from_bytes(unk))
+
         guid = data.read(16)
         colors.append(sub_colors[0])
     return colors

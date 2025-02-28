@@ -19,9 +19,9 @@ base = os.environ["BASE"]
 #ic.show()
 
 def parse_add_icons():
-    path = "natives/stm/gamedesign/gui/common/_userdata/addicondata.user.3.json"
+    path = "natives/STM/GameDesign/GUI/Common/_UserData/AddIconData.user.3.json"
     f = open(os.path.join(base, path))
-    add_icons_data = next(iter(json.load(f).values()))["Values"]
+    add_icons_data = json.load(f)[0]["rsz"]["Values"]
     add_icons = {}
     for add_icon in add_icons_data:
         id = add_icon["_AddIcon"]
@@ -33,11 +33,11 @@ def parse_add_icons():
 
 ADD_ICONS_DATA = parse_add_icons()
 
-ITEM_MSG_FILES = ["natives/stm/gamedesign/text/excel_data/item.msg"]
+ITEM_MSG_FILES = ["natives/STM/GameDesign/Text/Excel_Data/Item.msg"]
 
 def parse_items(self):
-    f = open(os.path.join(base, "natives/stm/gamedesign/common/item/itemdata.user.3.json"))
-    itemdata = next(iter(json.load(f).values()))["_Values"]
+    f = open(os.path.join(base, "natives/STM/GameDesign/Common/Item/itemData.user.3.json"))
+    itemdata = json.load(f)[0]["rsz"]["_Values"]
 
     items = {}
     for item in itemdata:
@@ -91,8 +91,8 @@ def parse_items(self):
     return items
 
 def parse_item_recipes(self, items):
-    f = open(os.path.join(base, "natives/stm/gamedesign/common/item/itemrecipe.user.3.json"))
-    itemdata = next(iter(json.load(f).values()))["_Values"]
+    f = open(os.path.join(base, "natives/STM/GameDesign/Common/Item/ItemRecipe.user.3.json"))
+    itemdata = json.load(f)[0]["rsz"]["_Values"]
 
     recipes = {}
     for recipe in itemdata:

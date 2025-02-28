@@ -15,16 +15,20 @@ def multiply_image_by_color(img, color):
     img_array = np.clip(img_array, 0, 255).astype(np.uint8)  # Clip and convert back to uint8
     return Image.fromarray(img_array, "RGBA")
 
-def split_spritesheet(image_path, sprite_width, sprite_height):
+def split_spritesheet(image_path, width, height, sprite_width=None, sprite_height=None, offset_x=0, offset_y=0):
+    if sprite_width is None:
+        sprite_width = width
+    if sprite_height is None:
+        sprite_height = height 
     img = Image.open(image_path)
     img_width, img_height = img.size
-    cols = img_width // sprite_width
-    rows = img_height // sprite_height
+    cols = img_width // width
+    rows = img_height // height
     sprites = []
     for row in range(rows):
         for col in range(cols):
-            left = col * sprite_width
-            top = row * sprite_height
+            left = col * width + offset_x
+            top = row * height + offset_y
             right = left + sprite_width
             bottom = top + sprite_height
             sprite = img.crop((left, top, right, bottom))
@@ -38,10 +42,23 @@ def add_padding(img, padding, color=(0, 0, 0, 0)):
     new_img.paste(img, (padding, padding), img)
     return new_img
 
+def combine_images_horz(imgs, offset):
+    width = sum([img.width + offset for img in imgs])
+    height = max([img.height for img in imgs])
+    combined = Image.new('RGBA', (width, height))
+    x, y = 0, 0
+    for img in imgs:
+        combined.paste(img, (x, y))
+        x += img.width + offset
+    return combined
+
+
 icon_dim = 100
-ICONS_TEX = split_spritesheet(os.path.join(base, f"natives/stm/gui/ui_texture/tex000000/tex000201_0_imlm4.tex.{version}.png"), icon_dim, icon_dim)
+ICONS_TEX = split_spritesheet(os.path.join(base, f"natives/STM/GUI/ui_texture/tex000000/tex000201_0_IMLM4.tex.{version}.png"), icon_dim, icon_dim)
 add_icon_dim = 64
-ADD_ICONS_TEX = split_spritesheet(os.path.join(base, f"natives/stm/gui/ui_texture/tex000000/tex000201_20_imlm4.tex.{version}.png"), add_icon_dim, add_icon_dim)
+ADD_ICONS_TEX = split_spritesheet(os.path.join(base, f"natives/STM/GUI/ui_texture/tex000000/tex000201_20_IMLM4.tex.{version}.png"), add_icon_dim, add_icon_dim)
 icon_dim = 100
-COL_ICONS = split_spritesheet(os.path.join(base, f"natives/stm/gui/ui_texture/tex000000/tex000201_1_imlm4.tex.{version}.png"), icon_dim, icon_dim)
-COL_ICONS[0].show
+COL_ICONS = split_spritesheet(os.path.join(base, f"natives/STM/GUI/ui_texture/tex000000/tex000201_1_IMLM4.tex.{version}.png"), icon_dim, icon_dim)
+
+MAP_NUMS = split_spritesheet(os.path.join(base, f"natives/STM/GUI/ui_texture/tex060000/tex060002_04_IMLM4.tex.{version}.png"), 100, 100, 70, 100, (100-70)/2)
+

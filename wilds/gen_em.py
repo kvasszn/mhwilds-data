@@ -16,16 +16,16 @@ base = os.environ["BASE"]
 MSG_FILES = [
         "combined_msgs.json",
 ]
-PARTS_FILE_EXT = "_param_parts.user.3.json"
+PARTS_FILE_EXT = "_Param_Parts.user.3.json"
 
 def parse_enemies(self):
-    base_path = os.path.join(base, "natives/stm/gamedesign/enemy")
+    base_path = os.path.join(base, "natives/STM/GameDesign/Enemy")
     enemies = {}
-    f = open(os.path.join(base, "natives/stm/gamedesign/common/enemy/enemydata.user.3.json"))
-    enemydata = json.load(f)["app.user_data.EnemyData"]["_Values"]
+    f = open(os.path.join(base, "natives/STM/GameDesign/Common/Enemy/EnemyData.user.3.json"))
+    enemydata = json.load(f)[0]["rsz"]["_Values"]
     
-    f = open(os.path.join(base, "natives/stm/gamedesign/common/enemy/enemyspecies.user.3.json"))
-    speciesdata = json.load(f)["app.user_data.EnemySpeciesData"]["_Values"]
+    f = open(os.path.join(base, "natives/STM/GameDesign/Common/Enemy/EnemySpecies.user.3.json"))
+    speciesdata = json.load(f)[0]["rsz"]["_Values"]
     species = {s["_EmSpecies"]: self.get_msg_by_guid(s["_EmSpeciesName"]) for s in speciesdata}
 
     for enemy in enemydata:
@@ -33,12 +33,13 @@ def parse_enemies(self):
         if id == "INVALID":
             continue
         emid, subid, idk = id.split("_")
+        emid = emid.removeprefix("EM")
 
-        reward_path = os.path.join(base, f"natives/stm/gamedesign/common/enemy/{id.lower()}.user.3.json")
+        reward_path = os.path.join(base, f"natives/STM/GameDesign/Common/Enemy/{id}.user.3.json")
         reward_data = []
         if os.path.exists(reward_path):
             f = open(reward_path)
-            reward_raw = json.load(f)["app.user_data.EnemyRewardData"]["_Values"]
+            reward_raw = json.load(f)[0]["rsz"]["_Values"]
             for reward in reward_raw:
                 item_ids = [i for i in reward["_IdEx"] if i != "INVALID"]
                 reward_data.append({
@@ -111,11 +112,20 @@ def parse_enemies(self):
             "tips": self.get_msg_by_guid(enemy["_EnemyTips"]),
             "memo": self.get_msg_by_guid(enemy["_Memo"]),
             "grammar": self.get_msg_by_guid(enemy["_Grammar"]),
+            "name_langs": self.get_msg_by_guid_all_langs(enemy["_EnemyName"]),
+            "explain_langs": self.get_msg_by_guid_all_langs(enemy["_EnemyExp"]),
+            "memo_langs": self.get_msg_by_guid_all_langs(enemy["_Memo"]),
             "species_id": enemy["_Species"],
             "species": species.get(enemy["_Species"]),
             "reward_data": reward_data,
         }
 
+        enemies[id]['color'] = icon_color
+        enemies[id]['item_icon'] = item_icon_id 
+        enemies[id]['map_icon'] = map_icon_id
+        enemies[id]['animal_icon'] = animal_icon_id
+        enemies[id]['zako_icon'] = zako_icon_id
+        enemies[id]['boss_icon'] = boss_icon_id
         #
         # FIX MULTI PARTS STUFF
         # FIX MULTI PARTS STUFF
@@ -124,10 +134,11 @@ def parse_enemies(self):
         #
         if not enemies.get(id):
             enemies[id] = {"parts_data": {}}
-        file_path = os.path.join(base_path, f"{emid.lower()}", subid, f"data/{emid.lower()}_{subid}{PARTS_FILE_EXT}") 
+        file_path = os.path.join(base_path, f"Em{emid}", subid, f"Data/Em{emid}_{subid}{PARTS_FILE_EXT}") 
+
         if os.path.exists(file_path):
             f = open(file_path)
-            parts_raw = json.load(f)["app.user_data.EmParamParts"]
+            parts_raw = json.load(f)[0]["rsz"]
             base_health = parts_raw["_BaseHealth"]
             meat_vals = {}
             for meat in parts_raw["_MeatArray"]["_DataArray"]:
@@ -174,11 +185,11 @@ def parse_enemies(self):
 
 
             # get thigns that can be cut off
-            file_path = os.path.join(base_path, f"em{emid}", subid, f"data/em{emid}_{subid}_param_partslost.user.3.json")
+            file_path = os.path.join(base_path, f"Em{emid}", subid, f"Data/Em{emid}_{subid}_Param_PartsLost.user.3.json")
             parts_lost = {}
             if os.path.exists(file_path):
                 f = open(file_path)
-                parts_lost_raw = json.load(f)["app.user_data.EmParamPartsLost"]["_PartsLostArray"]["_DataArray"]
+                parts_lost_raw = json.load(f)[0]["rsz"]["_PartsLostArray"]["_DataArray"]
                 for part in parts_lost_raw:
                     if guid := part.get("_TargetDataGuid"):
                         parts_lost[guid] = part
@@ -203,7 +214,11 @@ def parse_enemies(self):
 
     return enemies
 
-enemies = Parser2(parse_enemies, MSG_FILES, base, msg_ext="").parse()
-with open('wilds/data/enemies.json', 'w') as f:
-    json.dump(enemies, f, ensure_ascii=False, indent=4)
+def get_enemies():
+    enemies = Parser2(parse_enemies, MSG_FILES, base, msg_ext="").parse()
+    with open('wilds/data/enemies.json', 'w') as f:
+        json.dump(enemies, f, ensure_ascii=False, indent=4)
+    return enemies
 
+if __name__ == "__main__":
+    get_enemies()

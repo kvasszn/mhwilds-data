@@ -3,6 +3,7 @@ import json
 from typing import Dict
 import mwclient
 from dotenv import load_dotenv
+import re
 
 def wiki_init():
     load_dotenv()
@@ -51,6 +52,20 @@ class Parser2:
             entry = entry.replace("GRE", "green;")
             entry = entry.replace("COL>", "span>")
             return entry.replace("\r\n", " ")
+
+    def eval_ref(self, entry, lang=None):
+        refs = re.search('<REF (.*)>', entry)
+        if refs is None:
+            return entry
+        ref = refs.group(1)
+        ref_msg = self.get_msg(ref, lang=lang)
+        if ref_msg is None: 
+            return entry
+        entry = entry.replace(f"<REF {ref}>", ref_msg) 
+        if "<REF" in entry:
+            entry = self.eval_ref(entry, lang)
+        return entry
+
     
     def get_msg_by_guid(self, guid, lang=None):
         if lang is None:
@@ -62,13 +77,44 @@ class Parser2:
                 break
 
         if entry is not None:
-            entry = entry["content"][lang].replace("\r\n", " ").replace("<COL", "<span style=\"color:")
+            entry = entry["content"][lang]
+
+            entry = self.eval_ref(entry, lang)
+            if entry is None:
+                return None
+
+            entry = entry.replace("\r\n", " ").replace("<COL", "<span style=\"color:")
             entry = entry.replace("YEL", "yellow;")
             entry = entry.replace("RED", "red;")
             entry = entry.replace("BLU", "blue;")
             entry = entry.replace("GRE", "green;")
             entry = entry.replace("COL>", "span>")
-            return entry.replace("\r\n", " ")
+            entry = entry.replace("\r\n", " ")
+        return entry
+
+    def get_msg_by_guid_all_langs(self, guid):
+        entry = None
+        for msg_file in self.msg_files:
+            if entry := msg_file["msgs"].get(guid):
+                break
+
+        if entry is not None:
+            entry = entry["content"]
+            
+            for k, v in entry.items():
+                entry[k] = self.eval_ref(v, k)
+                if entry[k] is None:
+                    return None
+
+                entry[k] = entry[k].replace("\r\n", " ").replace("<COL", "<span style=\"color:")
+                entry[k] = entry[k].replace("YEL", "yellow;")
+                entry[k] = entry[k].replace("RED", "red;")
+                entry[k] = entry[k].replace("BLU", "blue;")
+                entry[k] = entry[k].replace("GRE", "green;")
+                entry[k] = entry[k].replace("COL>", "span>")
+                entry[k] = entry[k].replace("\r\n", " ")
+        return entry
+
 
     def get_msg_indexed(self, idx, hints=[], is_mr=False, lang=None):
         if lang is None:
